@@ -9,3 +9,5 @@ Barberros back-end for barbers online android application
 5. User get favorite list (done)
 6. User appointment list (not yet)
 7. All barbers things (not yet :D)
+8. User test (done)
+9. User routes and controller (done)

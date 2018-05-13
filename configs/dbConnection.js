@@ -8,7 +8,7 @@ const ObjectID = require('mongodb').ObjectID;
 const connection = (closure) => {
     return MongoClient.connect('mongodb://localhost:27017', (err, client) => {
         if ( err ) { throw err };
-        const db = client.db('baberros');
+        const db = client.db('barberros');
         closure(db);
     });
 };

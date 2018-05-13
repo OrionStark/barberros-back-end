@@ -4,6 +4,15 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const config = require('../configs/config')
 
+module.exports = {
+    register: register,
+    login: login,
+    checkSecondaryPass: checkSecondaryPass,
+    changePassword: changePassword,
+    getMyFavorites: getMyFavorites,
+    checkUserbyToken: checkUserbyToken
+}
+
 /**
  * 
  * @param {Object} userData 
@@ -18,9 +27,10 @@ function register(userData) {
         user.books = {}
     }
     dbConnection((db) => {
-        db.collection('users')
+        db.collection('clients')
             .findOne({username: userData.username}, (err, result) => {
                 if ( result ) {
+                    console.log(result)
                     defers.resolve({
                         status: false,
                         err_type: config.INVALID_PARAMS_ERR_TYPE,
@@ -30,6 +40,9 @@ function register(userData) {
                     bcrypt.genSalt(config.saltRounds, (err, result) => {
                         bcrypt.hash(userData.password, result, (err, hash) => {
                             if ( err ) {
+                                console.log(userData.password)
+                                console.log(err)
+                                console.log(result)
                                 defers.reject("Internal Error")
                             } else {
                                 userData.password = hash
@@ -59,10 +72,10 @@ function register(userData) {
  * @param {string} user username 
  * @param {string} secondaryPass secondary pass to change the primary one 
  */
-function getPrimaryPassword(user, secondaryPass) {
+function checkSecondaryPass(user, secondaryPass) {
     let defers = q.defer()
     dbConnection((db) => {
-        db.collection('user')
+        db.collection('clients')
             .findOne({username: user}, (err, result) => {
                 if(err) {
                     defers.resolve({
@@ -71,7 +84,7 @@ function getPrimaryPassword(user, secondaryPass) {
                         message: "There's something error with our system. Please try it again later"
                     })
                 } else {
-                    if ( secondaryPass == result.secondary_password ) {
+                    if ( secondaryPass == result.sec_password ) {
                         defers.resolve({
                             status: true,
                             message: "Access granted"
@@ -100,7 +113,7 @@ function changePassword(username, new_password) {
     bcrypt.genSalt(config.saltRounds, (err, res) => {
         bcrypt.hash(new_password, res, (err, hash) => {
             dbConnection((db) => {
-                db.collection('user')
+                db.collection('clients')
                     .updateOne({username: username}, {$set: {password: hash}}, (err, result) => {
                         if( err ) {
                             defers.resolve({
@@ -129,7 +142,7 @@ function changePassword(username, new_password) {
 function getMyFavorites(username) {
     let defers = q.defer()
     dbConnection((db) => {
-        db.collection('user')
+        db.collection('clients')
             .findOne({username: username}, (err, result) => {
                 if ( err ) {
                     defers.resolve({
@@ -160,8 +173,8 @@ function getMyFavorites(username) {
 function login(user) {
     let defers = q.defer()
     dbConnection((db) => {
-        db.collection('users')
-            .findOne({username: user.username}, (err, resonse) => {
+        db.collection('clients')
+            .findOne({username: user.username}, (err, response) => {
                 if (err) {
                     defers.resolve({
                         status: false,
@@ -179,11 +192,21 @@ function login(user) {
                             })
                         }
                         if ( result ) {
+                            let token = jwt.sign({username: response.username}, config.secret_key, {
+                                expiresIn: 86400
+                            })
                             defers.resolve({
                                 status: true,
                                 message: "Welcome to barberros, " + response.full_name,
                                 username: response.username,
-                                full_name: response.full_name
+                                full_name: response.full_name,
+                                token: token
+                            })
+                        } else {
+                            defers.resolve({
+                                status: false,
+                                err_type: config.INVALID_PARAMS_ERR_TYPE,
+                                message: "Your password is invalid. Please check it back"
                             })
                         }
                     })
@@ -208,7 +231,7 @@ function login(user) {
  */
 function createUser(user, callback) {
     dbConnection((db) => {
-        db.collection('users')
+        db.collection('clients')
             .insertOne(user, (err, result) => {
                 if ( err ) {
                     let error = {
@@ -222,6 +245,19 @@ function createUser(user, callback) {
                         status: true,
                         message: "Register succeed"
                     })
+                }
+            })
+    })
+}
+
+function checkUserbyToken(username, callback) {
+    dbConnection((db) => {
+        db.collection('clients')
+            .findOne({username: username}, (err, result) => {
+                if (result) {
+                    callback(true)
+                } else {
+                    callback(false)
                 }
             })
     })
