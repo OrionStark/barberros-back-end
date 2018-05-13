@@ -22,8 +22,8 @@ function register(userData) {
             .findOne({username: userData.username}, (err, result) => {
                 if ( result ) {
                     defers.resolve({
-                        code: 200,
                         status: false,
+                        err_type: config.INVALID_PARAMS_ERR_TYPE,
                         message: "Username already taken by someone"
                     })
                 } else {
@@ -54,16 +54,102 @@ function register(userData) {
     return defers.promise
 }
 
+/**
+ * 
+ * @param {string} user username 
+ * @param {string} secondaryPass secondary pass to change the primary one 
+ */
+function getPrimaryPassword(user, secondaryPass) {
+    let defers = q.defer()
+    dbConnection((db) => {
+        db.collection('user')
+            .findOne({username: user}, (err, result) => {
+                if(err) {
+                    defers.resolve({
+                        status: false,
+                        err_type: config.DB_ERR_TYPE,
+                        message: "There's something error with our system. Please try it again later"
+                    })
+                } else {
+                    if ( secondaryPass == result.secondary_password ) {
+                        defers.resolve({
+                            status: true,
+                            message: "Access granted"
+                        })
+                    } else {
+                        defers.resolve({
+                            status: false,
+                            err_type: config.INVALID_PARAMS_ERR_TYPE,
+                            message: "Your secondary password is not valid. Try it again"
+                        })
+                    }
+                }
+            })
+    })
+
+    return defers.promise
+}
+
+/**
+ * 
+ * @param {string} username 
+ * @param {string} new_password new password to add 
+ */
+function changePassword(username, new_password) {
+    let defers = q.defer()
+    bcrypt.genSalt(config.saltRounds, (err, res) => {
+        bcrypt.hash(new_password, res, (err, hash) => {
+            dbConnection((db) => {
+                db.collection('user')
+                    .updateOne({username: username}, {$set: {password: hash}}, (err, result) => {
+                        if( err ) {
+                            defers.resolve({
+                                status: false,
+                                err_type: config.DB_ERR_TYPE,
+                                message: "There's something error with our system. Please try it again later"
+                            })
+                        }
+                        if ( result ) {
+                            defers.resolve({
+                                status: true,
+                                message: "Please login with your new password"
+                            })
+                        }
+                    })
+            })
+        })
+    })
+    return defers.promise
+}
+
+/**
+ * 
+ * @param {string} username  
+ */
 function getMyFavorites(username) {
     let defers = q.defer()
     dbConnection((db) => {
         db.collection('user')
             .findOne({username: username}, (err, result) => {
                 if ( err ) {
-
+                    defers.resolve({
+                        status: false,
+                        err_type: config.DB_ERR_TYPE,
+                        message: "We got problem on our database. Please try it again later"
+                    })
+                } else {
+                    if ( result ) {
+                        let fav = result.favorites
+                        defers.resolve({
+                            status: true,
+                            data: fav
+                        })
+                    }
                 }
             })
     })
+
+    return defers.promise
 }
 
 /**
@@ -79,6 +165,7 @@ function login(user) {
                 if (err) {
                     defers.resolve({
                         status: false,
+                        err_type: config.DB_ERR_TYPE,
                         message: "There's an internal error. Please try it again later"
                     })
                 }
@@ -87,6 +174,7 @@ function login(user) {
                         if ( err ) {
                             defers.resolve({
                                 status: false,
+                                err_type: "unknown",
                                 message: "There's an internal error. Please try it again later"
                             })
                         }
@@ -102,6 +190,7 @@ function login(user) {
                 } else {
                     defers.resolve({
                         status: false,
+                        err_type: config.INVALID_PARAMS_ERR_TYPE,
                         message: "Your username is invalid. Please check it back"
                     })
                 }
@@ -115,7 +204,7 @@ function login(user) {
 /**
  * 
  * @param {Object} user User data 
- * @param {any} callback function callback 
+ * @param {Function} callback function callback 
  */
 function createUser(user, callback) {
     dbConnection((db) => {
