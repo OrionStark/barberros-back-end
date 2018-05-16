@@ -3,6 +3,7 @@ const dbConnection = require('../configs/dbConnection')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const config = require('../configs/config')
+const barber = require('./barbers')
 
 module.exports = {
     register: register,
@@ -261,4 +262,19 @@ function checkUserbyToken(username, callback) {
                 }
             })
     })
+}
+
+/**
+ * 
+ * @param {Object} data {username, barber_name, time, services} 
+ */
+function makeAppointment(data) {
+    let defers = q.defer()
+    barber.bookBarber(data.username, data.barber_name, data.time, data.services, (status, message) => {
+        defers.resolve({
+            status: status,
+            message: message
+        })
+    })
+    return defers.promise
 }
