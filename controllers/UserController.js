@@ -73,3 +73,14 @@ exports.changePassword = (req, res) => {
             res.status(501).send("Unknown error. Please try it again later")
         })
 }
+exports.makeAppointment = (req, res) => {
+    let data = req.body
+    console.log(data)
+    user.makeAppointment(data)
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).send("Internal Error")
+        })
+}

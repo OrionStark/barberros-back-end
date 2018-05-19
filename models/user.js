@@ -11,7 +11,8 @@ module.exports = {
     checkSecondaryPass: checkSecondaryPass,
     changePassword: changePassword,
     getMyFavorites: getMyFavorites,
-    checkUserbyToken: checkUserbyToken
+    checkUserbyToken: checkUserbyToken,
+    makeAppointment: makeAppointment
 }
 
 /**
@@ -22,10 +23,10 @@ module.exports = {
 function register(userData) {
     let defers = q.defer()
     function addFavorite(user) {
-        user.favorites = {}
+        user.favorites = []
     }
     function addBooks(user) {
-        user.books = {}
+        user.books = []
     }
     dbConnection((db) => {
         db.collection('clients')

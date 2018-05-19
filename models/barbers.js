@@ -65,8 +65,9 @@ function doneBarber(time, name) {
 function bookBarber(username, barber_name, time, services, callback) {
     let data = {
         user: username,
-        barber: barber_name,
-        services: services
+        barber_name: barber_name,
+        services: services,
+        book_time: time
     }
     order.addBooksInfo(data, (status, message) => {
         callback(status, message)
@@ -76,7 +77,7 @@ function bookBarber(username, barber_name, time, services, callback) {
 function getBarberByName(barber_name, callback) {
     dbConnection((db) => {
         db.collection("barbers")
-            .findOne({name: barber_name}, (err, result) => {
+            .findOne({barber_name: barber_name}, (err, result) => {
                 if ( err && !result ) {
                     callback(false, result)
                 }

@@ -14,7 +14,7 @@ function addBooksInfo(data, callback) {
     let barber_name = data.barber_name
     let book_time = data.book_time
     data.status = "Ongoing"
-    getBooksInfoByTimeandName(book_time, barber_name, (status, data) => {
+    getBooksInfoByTimeandName(book_time, barber_name, (status, datas) => {
         if ( status ) {
             callback(false, "Please choose the other time.")
         } else {
@@ -35,15 +35,12 @@ function addBooksInfo(data, callback) {
 function makeBookDone(time, name, callback) {
     getBooksInfoByTimeandName(time, name, (status, data) => {
         if ( !status ) {
-            defers.resolve({
-                status: false,
-                message: "Are you fucking kidding me?. We didn't even fond that barber."
-            })
+            callback(false, "Are you fucking kidding me?. We didn't even found that barber.")
         } else {
             data.status = "Done"
             dbConnection((db) => {
                 db.collection("books")
-                    .updateOne({name: time, name: name}, {$set: {status: "Done"}}, (err, res) => {
+                    .updateOne({book_time: time, barber_name: name, status: "Ongoing"}, {$set: {status: "Done"}}, (err, res) => {
                         if ( res ) {
                             callback(true, "Thank you. Please come back again")
                         } else {
@@ -58,13 +55,35 @@ function makeBookDone(time, name, callback) {
 function getBooksInfoByTimeandName(time, name, callback) {
     dbConnection((db) => {
         db.collection("books")
-            .findOne({time: time, name: name}, (err, res) => {
+            .findOne({book_time: time, barber_name: name, status: "Ongoing"}, (err, res) => {
                 if ( res ) {
-                    if ( res.status === "Done" ) {
-                        callback(false, res)
-                    } else {
-                        callback(true, res)
-                    }
+                    callback(true, res)
+                } else {
+                    callback(false, res)
+                }
+            })
+    })
+}
+
+function getCompletedBooksByUsername(username, callback) {
+    dbConnection((db) => {
+        db.collection("books")
+            .find({user: username, status: "Done"}, (err, res) => {
+                if (res) {
+                    callback(true, res)
+                } else {
+                    callback(false, res)
+                }
+            })
+    })
+}
+
+function getOngoingBooksByUsername(username, callback) {
+    dbConnection((db) => {
+        db.collection("books")
+            .find({user: username, status: "Ongoing"}, (err, res) => {
+                if (res) {
+                    callback(true, res)
                 } else {
                     callback(false, res)
                 }

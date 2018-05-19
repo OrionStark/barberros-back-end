@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const config = require('../configs/config')
 const user = require('../models/user')
 const user_controller = require('../controllers/UserController')
+const barber_controller = require('../controllers/BarberController')
 
 router.all("/user/*", (req, res, next) => {
     console.log(req.headers)
@@ -38,5 +39,8 @@ router.post("/user/register", user_controller.register)
 router.post("/user/login", user_controller.login)
 router.post("/user/check-secondary-password", user_controller.checkSecondaryPass)
 router.post("/user/change-password", user_controller.changePassword)
+router.post("/barber/addBarber", barber_controller.addBarber)
+router.post("/user/barber/makeAppointment", user_controller.makeAppointment)
+router.post("/barber/done", barber_controller.doneBarber)
 
 module.exports = router
