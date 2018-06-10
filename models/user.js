@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const config = require('../configs/config')
 const barber = require('./barbers')
+const mongo = require('mongodb')
+const books = require('./books')
 
 module.exports = {
     register: register,
@@ -12,7 +14,9 @@ module.exports = {
     changePassword: changePassword,
     getMyFavorites: getMyFavorites,
     checkUserbyToken: checkUserbyToken,
-    makeAppointment: makeAppointment
+    makeAppointment: makeAppointment,
+    getMyOngoingAppointments: getMyOngoingAppointments,
+    addFavorite: addFavorite
 }
 
 /**
@@ -152,13 +156,20 @@ function getMyFavorites(username) {
                         err_type: config.DB_ERR_TYPE,
                         message: "We got problem on our database. Please try it again later"
                     })
+                    return defers.promise
                 } else {
                     if ( result ) {
-                        let fav = result.favorites
-                        defers.resolve({
-                            status: true,
-                            data: fav
-                        })
+                        let fav = []
+                        for ( let i = 0; i < result.favorites.length; i++ ) {
+                            fav.push(new mongo.ObjectID(result.favorites[i]))
+                        }
+                        db.collection('barbers')
+                            .find({_id: {$in: fav}}).toArray((err, data) => {
+                                defers.resolve({
+                                    status: true,
+                                    data: data
+                                })
+                            })
                     }
                 }
             })
@@ -277,5 +288,65 @@ function makeAppointment(data) {
             message: message
         })
     })
+    return defers.promise
+}
+
+function getMyOngoingAppointments(username) {
+    let defers = q.defer()
+    books.getOngoingBooks(username, (status, result) => {
+        defers.resolve({
+            status: status,
+            result: result
+        })
+    })
+    return defers.promise
+}
+
+function addFavorite(username, barber_id) {
+    let defers = q.defer()
+    dbConnection((db) => {
+        db.collection('clients')
+            .findOne({username: username}, (err, result) => {
+                if (result) {
+                    let status = false
+                    for ( let i = 0; i < result.favorites.length; i++ ) {
+                        if ( result.favorites[i] === barber_id ) {
+                            status = true
+                            break;
+                        }
+                    }
+                    if (!status) {
+                        let favs = result.favorites
+                        favs.push(barber_id)
+                        db.collection('clients')
+                            .updateOne({username: username}, {$set: {favorites: favs}}, (err, res) => {
+                                if ( res ) {
+                                    defers.resolve(
+                                        {
+                                            status: true,
+                                            message: "Added to your favorites list"
+                                        }
+                                    )
+                                } else {
+                                    defers.resolve(
+                                        {
+                                            status: false,
+                                            message: "We got some problems here"
+                                        }
+                                    )
+                                }
+                            })
+                    } else {
+                        defers.resolve(
+                            {
+                                status: false,
+                                message: "This barber already in your favorites list"
+                            }
+                        )
+                    }
+                }
+            })
+    })
+
     return defers.promise
 }

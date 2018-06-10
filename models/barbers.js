@@ -94,7 +94,7 @@ function getBarbers() {
     let defers = q.defer()
     dbConnection((db) => {
         db.collection("barbers")
-            .find({}, (err, result) => {
+            .find({}).toArray((err, result) => {
                 if ( result ) {
                     defers.resolve({
                         status: true,

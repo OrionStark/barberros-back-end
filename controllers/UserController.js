@@ -84,3 +84,36 @@ exports.makeAppointment = (req, res) => {
             res.status(500).send("Internal Error")
         })
 }
+exports.getOngoingAppointments = (req, res) => {
+    let username = req.params.username
+    console.log(username)
+    user.getMyOngoingAppointments(username)
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).send("Internal Error")
+        })
+}
+
+exports.addFavorite = (req, res) => {
+    let username = req.body.username
+    let barber_id = req.body.barber_id
+    user.addFavorite(username, barber_id)
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).send("Internal Error")
+        })
+}
+exports.getFavorites = (req, res) => {
+    let username = req.params.username
+    user.getMyFavorites(username)
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).send("Internal Error")
+        })
+}

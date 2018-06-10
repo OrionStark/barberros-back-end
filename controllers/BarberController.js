@@ -10,7 +10,7 @@ exports.addBarber = (req, res) => {
                     if ( result.err_type == config.INVALID_PARAMS_ERR_TYPE ) {
                         res.status(401).json(result)
                     } else {
-                        res.status(501).json(result)
+                        res.status(200).json(result)
                     }
                 } else {
                     res.status(200).json(result)
@@ -21,6 +21,17 @@ exports.addBarber = (req, res) => {
             res.status(500).send(err)
         })
 }
+
+exports.getBarbers = (req, res) => {
+    barber.getBarbers()
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).send(err)
+        })
+}
+
 exports.doneBarber = (req, res) => {
     let data = req.body
     barber.doneBarber(data.time, data.name)

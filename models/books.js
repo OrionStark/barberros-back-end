@@ -6,7 +6,8 @@ const config = require('../configs/config')
 module.exports = {
     addBooksInfo: addBooksInfo,
     makeBookDone: makeBookDone,
-    getBooksInfoByTimeandName: getBooksInfoByTimeandName
+    getBooksInfoByTimeandName: getBooksInfoByTimeandName,
+    getOngoingBooks: getOngoingBooksByUsername
 }
 
 function addBooksInfo(data, callback) {
@@ -81,7 +82,7 @@ function getCompletedBooksByUsername(username, callback) {
 function getOngoingBooksByUsername(username, callback) {
     dbConnection((db) => {
         db.collection("books")
-            .find({user: username, status: "Ongoing"}, (err, res) => {
+            .find({user: username, status: "Ongoing"}).toArray((err, res) => {
                 if (res) {
                     callback(true, res)
                 } else {

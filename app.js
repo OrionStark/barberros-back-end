@@ -10,7 +10,6 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 app.use(morgan('dev'))
 app.use(router)
-app.use(router)
 const server = app.listen(process.env.PORT || 8080, () => {
     var port = server.address().port
     console.log("Barberros started on " + port)
