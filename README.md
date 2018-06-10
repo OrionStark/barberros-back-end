@@ -8,7 +8,7 @@ This code is for my friends.
         // This code will run with nodemon
 
         /*
-            If you find that the project has an error. Please rebuild or update or reinstall npm
+            If you find that the project had an error. Please rebuild or update or reinstall npm
         */
 ```
 # If there's an error package?
