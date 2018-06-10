@@ -18,6 +18,7 @@ This code is for my friends.
 
 ## Routes Params
 Route | Expected Parameter
+----- | ------------------
 /user/register | username(string), full_name(string), no_telp(string), password(string), sec_password(string), email(string)
 /user/login | username(string), password(string)
 /user/check-secondary-password | username(string), sec_pass(string), token(string)
