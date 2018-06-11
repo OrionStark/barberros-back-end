@@ -1,6 +1,10 @@
 # Barberros  
 Barberros back-end for barbers online android application.  
-This code is for my friends.
+This code is for my friends.  
+
+# First thing you need to start before running the server
+1. Open your mongodb service
+2. command ``` sudo service mongod start ```
 
 # How to use it
 ```javascript
