@@ -211,8 +211,12 @@ function login(user) {
                             defers.resolve({
                                 status: true,
                                 message: "Welcome to barberros, " + response.full_name,
-                                username: response.username,
-                                full_name: response.full_name,
+                                data: {
+                                    username: response.username,
+                                    full_name: response.full_name,
+                                    no_telp: response.no_telp,
+                                    email: response.email
+                                },
                                 token: token
                             })
                         } else {

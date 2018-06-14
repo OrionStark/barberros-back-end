@@ -28,9 +28,9 @@ Route | Expected Parameter
 /user/check-secondary-password | username(string), sec_pass(string), token(string)
 /user/change-password | username(string), new_password(string), token(string)
 /barber/getbarbers (get request need authorization header) | auth header
-/barber/addBarber | barber_name(string), times(array of string), services(array of string), latitude(string), longitude(string), description(string), no_telp(string)
+/barber/addBarber | barber_name(string), times(array of string), services(array of string), latitude(string), longitude(string), description(string), no_telp(string), image(string base64)
 /user/barber/makeAppointment | token(string), barber_name(string), username(string), time(string), service(string)
-/barber/done | time(string), name(string)
+/barber/done | time(string), name(string), id(string[this is the order's id])
 /user/barber/ongoing/:username (get request need authorization header) | username url param, authorization header with token
 /user/favorite/add | token(string), username(string), barber_id(string)
 /user/:username/favorites (get request need authorization header) | username request params, token in authorization header

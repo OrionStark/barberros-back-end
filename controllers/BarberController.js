@@ -34,7 +34,7 @@ exports.getBarbers = (req, res) => {
 
 exports.doneBarber = (req, res) => {
     let data = req.body
-    barber.doneBarber(data.time, data.name)
+    barber.doneBarber(data.time, data.name, data.id)
         .then(
             result => {
                 if ( result.status == false ) {

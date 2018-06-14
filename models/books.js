@@ -1,6 +1,7 @@
 const dbConnection = require('../configs/dbConnection')
 const q = require('q')
 const config = require('../configs/config')
+const mongo = require('mongodb').ObjectID;
 
 
 module.exports = {
@@ -33,8 +34,8 @@ function addBooksInfo(data, callback) {
     })
 }
 
-function makeBookDone(time, name, callback) {
-    getBooksInfoByTimeandName(time, name, (status, data) => {
+function makeBookDone(time, name, id, callback) {
+    getBooksInfoByTimeandName(time, name, id, (status, data) => {
         if ( !status ) {
             callback(false, "Are you fucking kidding me?. We didn't even found that barber.")
         } else {
@@ -53,10 +54,10 @@ function makeBookDone(time, name, callback) {
     })
 }
 
-function getBooksInfoByTimeandName(time, name, callback) {
+function getBooksInfoByTimeandName(time, name, id, callback) {
     dbConnection((db) => {
         db.collection("books")
-            .findOne({book_time: time, barber_name: name, status: "Ongoing"}, (err, res) => {
+            .findOne({book_time: time, barber_name: name, status: "Ongoing", _id: new mongo(id)}, (err, res) => {
                 if ( res ) {
                     callback(true, res)
                 } else {

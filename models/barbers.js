@@ -51,9 +51,9 @@ function addBarber(data) {
     return defers.promise
 }
 
-function doneBarber(time, name) {
+function doneBarber(time, name, id) {
     let defers = q.defer()
-    order.makeBookDone(time, name, (status, message) => {
+    order.makeBookDone(time, name, id, (status, message) => {
         defers.resolve({
             status: status,
             message: message
