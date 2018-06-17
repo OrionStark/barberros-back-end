@@ -13,6 +13,18 @@ module.exports = {
 
 function addBarber(data) {
     let defers = q.defer()
+    data.services = [
+        "Cuci Kepala",
+        "Cuci Kumis",
+        "Cuci Kaki",
+        "Cukur Bulu"
+    ]
+    data.times = [
+        "AM 10:00",
+        "AM 11:00",
+        "PM 12:00",
+        "PM 13:00"
+    ]
     getBarberByName(data.barber_name, (status) => {
         if ( status ) {
             defers.resolve({
