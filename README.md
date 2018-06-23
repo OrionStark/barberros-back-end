@@ -34,6 +34,7 @@ Route | Expected Parameter
 /user/barber/ongoing/:username (get request need authorization header) | username url param, authorization header with token
 /user/favorite/add | token(string), username(string), barber_id(string)
 /user/:username/favorites (get request need authorization header) | username request params, token in authorization header
+/user/book/cancel | time(string), name(string), id(string)
 
 ## Info
 If there's something missing or need improve, please contact me. Or discuss it on the group-chat 

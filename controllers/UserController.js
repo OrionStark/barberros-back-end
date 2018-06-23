@@ -1,5 +1,6 @@
 const user = require('../models/user')
 const config = require('../configs/config')
+const book = require('../models/books')
 exports.register = (req, res) => {
     let data = req.body
     user.register(data)
@@ -110,6 +111,16 @@ exports.addFavorite = (req, res) => {
 exports.getFavorites = (req, res) => {
     let username = req.params.username
     user.getMyFavorites(username)
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).send("Internal Error")
+        })
+}
+exports.cancelBook = (req, res) => {
+    let data = req.body
+    book.cancelBook(data.time, data.name, data.id)
         .then(result => {
             res.status(200).json(result)
         })

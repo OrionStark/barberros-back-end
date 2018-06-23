@@ -8,7 +8,8 @@ module.exports = {
     addBooksInfo: addBooksInfo,
     makeBookDone: makeBookDone,
     getBooksInfoByTimeandName: getBooksInfoByTimeandName,
-    getOngoingBooks: getOngoingBooksByUsername
+    getOngoingBooks: getOngoingBooksByUsername,
+    cancelBook: cancelBook
 }
 
 function addBooksInfo(data, callback) {
@@ -52,6 +53,45 @@ function makeBookDone(time, name, id, callback) {
             })
         }
     })
+}
+
+function cancelBook(time, name, id) {
+    let defers = q.defer()
+    getBooksInfoByTimeandName(time, name, id, (status, data) => {
+        if (!status) {
+            defers.resolve(
+                {
+                    status: false,
+                    message: "We didn't find that barber"
+                }
+            )
+        } else {
+            data.status = "Cancel"
+            dbConnection((db) => {
+                db.collection('books')
+                    .updateOne({_id: new mongo(id)},{$set: {status: data.status}}, (err, result) => {
+                        if ( res ) {
+                            callback(true, "Your order has been cancel")
+                            defers.resolve(
+                                {
+                                    status: true,
+                                    message: "Your order has been cancel"
+                                }
+                            )
+                        } else {
+                            defers.resolve(
+                                {
+                                    status: false,
+                                    message: "There's some errors. Please try it again later."
+                                }
+                            )
+                        }
+                    })
+            })
+        }
+    })
+
+    return defers.promise
 }
 
 function getBooksInfoByTimeandName(time, name, id, callback) {

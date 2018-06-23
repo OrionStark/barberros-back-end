@@ -66,5 +66,6 @@ router.post("/barber/done", barber_controller.doneBarber)
 router.get("/user/barber/ongoing/:username", user_controller.getOngoingAppointments)
 router.post("/user/favorite/add", user_controller.addFavorite)
 router.get("/user/:username/favorites", user_controller.getFavorites)
+router.post("/user/book/cancel", user_controller.cancelBook)
 
 module.exports = router
