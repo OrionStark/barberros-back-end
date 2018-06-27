@@ -7,7 +7,9 @@ const barber_controller = require('../controllers/BarberController')
 
 router.all("/user/*", (req, res, next) => {
     console.log(req.headers)
-    if ( req.path === '/user/login' || req.path === '/user/register' ) {
+    if ( req.path === '/user/login' || req.path === '/user/register' 
+            || req.path === '/user/change-password' 
+            || req.path === '/user/check-secondary-password' ) {
         next()
     } else {
         if ( req.body.token ) {

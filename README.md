@@ -25,8 +25,8 @@ Route | Expected Parameter
 ----- | ------------------
 /user/register | username(string), full_name(string), no_telp(string), password(string), sec_password(string), email(string)
 /user/login | username(string), password(string)
-/user/check-secondary-password | username(string), sec_pass(string), token(string)
-/user/change-password | username(string), new_password(string), token(string)
+/user/check-secondary-password | username(string), sec_pass(string)
+/user/change-password | username(string), new_password(string)
 /barber/getbarbers (get request need authorization header) | auth header
 /barber/addBarber | barber_name(string), latitude(string), longitude(string), description(string), no_telp(string), image(string base64, address(string))
 /user/barber/makeAppointment | token(string), barber_name(string), username(string), time(string), service(string)
