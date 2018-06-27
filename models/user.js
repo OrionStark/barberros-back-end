@@ -90,16 +90,25 @@ function checkSecondaryPass(user, secondaryPass) {
                         message: "There's something error with our system. Please try it again later"
                     })
                 } else {
-                    if ( secondaryPass == result.sec_password ) {
-                        defers.resolve({
-                            status: true,
-                            message: "Access granted"
-                        })
+                    console.log(secondaryPass)
+                    if ( result ) {
+                        if ( secondaryPass == result.sec_password ) {
+                            defers.resolve({
+                                status: true,
+                                message: "Access granted"
+                            })
+                        } else {
+                            defers.resolve({
+                                status: false,
+                                err_type: config.INVALID_PARAMS_ERR_TYPE,
+                                message: "Your secondary password is not valid. Try it again"
+                            })
+                        }
                     } else {
                         defers.resolve({
                             status: false,
                             err_type: config.INVALID_PARAMS_ERR_TYPE,
-                            message: "Your secondary password is not valid. Try it again"
+                            message: "User not found"
                         })
                     }
                 }
